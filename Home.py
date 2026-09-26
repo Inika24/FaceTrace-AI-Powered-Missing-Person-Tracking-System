@@ -23,12 +23,41 @@ db_queries.create_db()
 if "login_status" not in st.session_state:
     st.session_state["login_status"] = False
 
-try:
-    with open("login_config.yml") as file:
-        config = yaml.load(file, Loader=SafeLoader)
-except FileNotFoundError:
-    st.error("❌ Configuration file 'login_config.yml' not found.")
-    st.stop()
+config = None
+if os.path.exists("login_config.yml"):
+    try:
+        with open("login_config.yml") as file:
+            config = yaml.load(file, Loader=SafeLoader)
+    except Exception:
+        pass
+
+if not config and hasattr(st, "secrets") and "credentials" in st.secrets:
+    try:
+        config = dict(st.secrets)
+    except Exception:
+        pass
+
+if not config:
+    config = {
+        "credentials": {
+            "usernames": {
+                "inika": {
+                    "email": "inikab@gmail.com",
+                    "name": "Inika B",
+                    "city": "Tiruppur",
+                    "area": "Avinashi",
+                    "role": "Admin",
+                    "password": "$2b$12$ByZbwxrcvCXVLQO4zjI95OteXToaBiwWDqujsHiKfeGzionz0VqAG"
+                }
+            }
+        },
+        "cookie": {
+            "expiry_days": 1,
+            "key": "a8f3d2e1b9c7f4a0e5d6c3b2a1f8e7d4c9b0a3f2e1d8c7b6a5f4e3d2c1b0a9",
+            "name": "random_cookie_name"
+        },
+        "preauthorized": {"emails": ["inikab@gmail.com"]}
+    }
 
 authenticator = stauth.Authenticate(
     config["credentials"],
