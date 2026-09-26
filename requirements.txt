@@ -7,7 +7,7 @@ numpy
 pillow
 sqlmodel
 psycopg2-binary
-streamlit-authenticator==0.4.2
+streamlit-authenticator
 folium
 streamlit-folium
 qrcode
