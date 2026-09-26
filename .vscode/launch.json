@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Streamlit App (Officer Portal)",
+            "type": "python",
+            "request": "launch",
+            "module": "streamlit",
+            "args": [
+                "run",
+                "${workspaceFolder}/Home.py"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Run Streamlit App (Public Portal)",
+            "type": "python",
+            "request": "launch",
+            "module": "streamlit",
+            "args": [
+                "run",
+                "${workspaceFolder}/mobile_app.py"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
+}
