@@ -293,6 +293,51 @@ def inject_custom_theme():
         unsafe_allow_html=True,
     )
 
+def render_sidebar_chatbot():
+    """Render universal sidebar AVINASHI-AI assistant across all pages."""
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = [
+            {"role": "assistant", "content": "👋 Welcome Officer Inika! I am **AVINASHI-AI**. Ask me anything about registered cases, location statistics, or facial mesh metrics!"}
+        ]
+
+    with st.sidebar:
+        st.markdown("<br>", unsafe_allow_html=True)
+        with st.expander("🤖 AVINASHI-AI Assistant", expanded=False):
+            st.caption("Police Command Intelligence Assistant")
+
+            # Quick suggestion buttons
+            q1, q2 = st.columns(2)
+            if q1.button("📊 Total Cases", key="sb_btn_q1"):
+                st.session_state["sb_chat_query"] = "How many total cases are registered?"
+            if q2.button("📍 Tiruppur", key="sb_btn_q2"):
+                st.session_state["sb_chat_query"] = "Show cases in Tiruppur"
+
+            # Display last 4 messages in history
+            for msg in st.session_state["chat_history"][-4:]:
+                if msg["role"] == "user":
+                    st.markdown(f"**You:** {msg['content']}")
+                else:
+                    st.markdown(f"**AVINASHI-AI:** {msg['content']}")
+
+            # Form Input for query
+            with st.form(key="sb_chat_form", clear_on_submit=True):
+                default_val = st.session_state.pop("sb_chat_query", "")
+                sb_query = st.text_input(
+                    "Ask AVINASHI-AI:",
+                    value=default_val,
+                    placeholder="Type a question...",
+                    label_visibility="collapsed"
+                )
+                submit_sb = st.form_submit_button("💬 Send Query", type="primary", use_container_width=True)
+
+            if submit_sb and sb_query.strip():
+                from pages.helper import chatbot_engine
+                st.session_state["chat_history"].append({"role": "user", "content": sb_query})
+                user_name = st.session_state.get("username", "inika")
+                response = chatbot_engine.query_avinashi_ai(sb_query, current_user=user_name)
+                st.session_state["chat_history"].append({"role": "assistant", "content": response})
+                st.rerun()
+
 def render_ticker():
     """Render live command ticker header bar."""
     st.markdown(
@@ -311,6 +356,7 @@ def render_ticker():
 def render_header(title: str, subtitle: str = "", badge: str = "OFFICER & PUBLIC PORTAL", icon: str = "🛡️"):
     """Render a unified high-end page header banner."""
     render_ticker()
+    render_sidebar_chatbot()
     st.markdown(
         f"""
         <div class="portal-header">
@@ -355,7 +401,7 @@ def render_login_prompt(page_name: str = "this feature"):
                 Officer Sign-In Required
             </h3>
             <p style="color: #64748b; font-size: 0.95rem; margin-top: 0.4rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-                You are viewing <strong>{page_name}</strong>. Please sign in as an officer or click below for instant 1-Click Demo Login access.
+                You are viewing <strong>{page_name}</strong>. Please sign in as an officer or click below for instant 1-Click Officer Sign-In access.
             </p>
         </div>
         """,
@@ -363,8 +409,11 @@ def render_login_prompt(page_name: str = "this feature"):
     )
     c1, c2, c3 = st.columns([1, 2, 1])
     with c2:
-        if st.button("⚡ Instant 1-Click Officer Login (Demo)", key=f"quick_login_{page_name}"):
+        if st.button("⚡ Instant 1-Click Officer Sign-In", key=f"quick_login_{page_name}", type="primary", use_container_width=True):
             st.session_state["authentication_status"] = True
             st.session_state["username"] = "inika"
+            st.session_state["user"] = "inika"
+            st.session_state["role"] = "Admin"
             st.session_state["login_status"] = True
             st.rerun()
+

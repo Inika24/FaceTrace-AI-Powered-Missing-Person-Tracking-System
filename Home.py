@@ -7,6 +7,7 @@ import streamlit_authenticator as stauth
 
 from pages.helper import db_queries
 from pages.helper import ui_theme
+from pages.helper import chatbot_engine
 
 st.set_page_config(
     page_title="Missing Person AI Identification & Command Portal",
@@ -82,48 +83,41 @@ if not st.session_state.get("authentication_status"):
                 <p style="color: #64748b; font-size: 1.05rem; margin-top: 0.4rem;">
                     Law Enforcement Officer & Public Intelligence Network
                 </p>
-                <div style="margin-top: 0.8rem;">
-                    <span style="background: #e0f2fe; color: #0369a1; padding: 5px 15px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; border: 1px solid #bae6fd;">
-                        ⚡ AI Facial Mesh 468 Landmark Core & CCTV Scanner
-                    </span>
-                </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        # Demo Sign-In Card & Instant Login
+        # Sign-In Card
         st.markdown(
             """
-            <div class="login-box" style="margin-bottom: 1.5rem;">
-                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-top: 0; text-align: center;">
+            <div style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 18px; padding: 1.5rem; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); text-align: center; margin-bottom: 1.2rem;">
+                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0;">
                     👮 Station Officer Portal Sign-In
                 </h3>
-                <div style="background: #f1f5f9; border-radius: 10px; padding: 0.8rem; margin: 0.8rem 0; font-size: 0.88rem; color: #334155; text-align: center;">
-                    🔑 <strong>Demo Station Credentials:</strong><br>
-                    Username: <code style="color: #1d4ed8; font-weight: 700;">inika</code> &nbsp;|&nbsp; 
-                    Password: <code style="color: #1d4ed8; font-weight: 700;">abc</code>
-                </div>
+                <p style="color: #64748b; font-size: 0.88rem; margin-top: 0.3rem; margin-bottom: 0;">
+                    Authorized Station Officers & Command Administrators
+                </p>
+            </div>
             """,
             unsafe_allow_html=True,
         )
 
-        demo_login_btn = st.button("⚡ Instant 1-Click Officer Sign-In (Demo Access)", key="home_demo_btn", type="primary")
-        if demo_login_btn:
+        # Instant 1-Click Officer Sign-In Button
+        if st.button("⚡ Instant 1-Click Officer Sign-In", type="primary", use_container_width=True, key="home_1click_signin_btn"):
             st.session_state["authentication_status"] = True
             st.session_state["username"] = "inika"
+            st.session_state["user"] = "inika"
+            st.session_state["role"] = "Admin"
             st.session_state["login_status"] = True
             st.rerun()
 
-        st.markdown("<div style='text-align:center; color:#94a3b8; font-size:0.85rem; margin:0.8rem 0;'>or sign in below</div>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center; color: #64748b; font-size: 0.85rem; margin: 0.8rem 0 0.4rem 0;'>— OR ENTER STATION CREDENTIALS —</div>", unsafe_allow_html=True)
 
-# Perform authenticator login widget only when not authenticated
-if not st.session_state.get("authentication_status"):
-    try:
-        authenticator.login(location="main")
-    except Exception:
-        pass
+        try:
+            authenticator.login(location="main")
+        except Exception:
+            pass
 
 # ── Post-Login Officer Dashboard ──────────────────────────────────────────────
 if st.session_state.get("authentication_status"):
@@ -251,6 +245,61 @@ if st.session_state.get("authentication_status"):
             unsafe_allow_html=True,
         )
 
+    # ── AVINASHI-AI Conversational Assistant Module ─────────────────────────────
+    st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style="background: linear-gradient(135deg, #090d16 0%, #1e3a8a 100%); padding: 1.2rem 1.5rem; border-radius: 12px; color: white; margin-bottom: 1.2rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #93c5fd; text-transform: uppercase; letter-spacing: 0.5px;">CONVERSATIONAL AI ENGINE</div>
+            <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.35rem; font-weight: 800; color: #ffffff; margin: 0.2rem 0;">
+                🤖 AVINASHI-AI — Command Intelligence Assistant
+            </h3>
+            <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0;">
+                Ask natural language questions about missing records, city case density, birthmark features, or AI algorithms.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = [
+            {"role": "assistant", "content": "👋 Welcome Officer Inika! I am **AVINASHI-AI**. Ask me anything about registered cases, location statistics, or facial mesh metrics!"}
+        ]
+
+    # Quick Suggestion Chips
+    q_col1, q_col2, q_col3, q_col4 = st.columns(4)
+    if q_col1.button("📊 Total Cases Count", key="btn_q1"):
+        st.session_state["pending_chat_query"] = "How many total cases are registered?"
+    if q_col2.button("📍 Cases in Tiruppur", key="btn_q2"):
+        st.session_state["pending_chat_query"] = "Show cases in Tiruppur"
+    if q_col3.button("🔍 Birthmark Search", key="btn_q3"):
+        st.session_state["pending_chat_query"] = "Find cases with birthmark on chin"
+    if q_col4.button("🧠 Explain AI Mesh", key="btn_q4"):
+        st.session_state["pending_chat_query"] = "Explain 468 landmark mesh algorithm"
+
+    # Chat message history
+    for msg in st.session_state["chat_history"]:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    # Form Input for query
+    with st.form(key="sentinel_chat_form", clear_on_submit=True):
+        default_val = st.session_state.pop("pending_chat_query", "")
+        chat_query = st.text_input(
+            "Type your question for AVINASHI-AI below:",
+            value=default_val,
+            placeholder="e.g. How many cases in Tiruppur? or Explain MediaPipe 468 mesh..."
+        )
+        submit_chat = st.form_submit_button("💬 Send Query to AVINASHI-AI", type="primary")
+
+    if submit_chat and chat_query.strip():
+        st.session_state["chat_history"].append({"role": "user", "content": chat_query})
+        response = chatbot_engine.query_avinashi_ai(chat_query, current_user=st.session_state.get("user", "inika"))
+        st.session_state["chat_history"].append({"role": "assistant", "content": response})
+        st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
     # ── Interactive Cases Map Section ─────────────────────────────────────────
