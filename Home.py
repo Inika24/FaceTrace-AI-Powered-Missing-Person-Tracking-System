@@ -108,6 +108,7 @@ if not st.session_state.get("authentication_status"):
             st.session_state["authentication_status"] = True
             st.session_state["username"] = "inika"
             st.session_state["user"] = "inika"
+            st.session_state["name"] = "Inika B"
             st.session_state["role"] = "Admin"
             st.session_state["login_status"] = True
             st.rerun()
