@@ -305,12 +305,21 @@ def render_sidebar_chatbot():
         with st.expander("🤖 AVINASHI-AI Assistant", expanded=False):
             st.caption("Police Command Intelligence Assistant")
 
-            # Quick suggestion buttons
+            # Quick suggestion buttons (Instant Interactive Triggers)
             q1, q2 = st.columns(2)
+            sb_selected = None
             if q1.button("📊 Total Cases", key="sb_btn_q1"):
-                st.session_state["sb_chat_query"] = "How many total cases are registered?"
-            if q2.button("📍 Tiruppur", key="sb_btn_q2"):
-                st.session_state["sb_chat_query"] = "Show cases in Tiruppur"
+                sb_selected = "How many total cases are registered?"
+            elif q2.button("📍 Tiruppur", key="sb_btn_q2"):
+                sb_selected = "Show cases in Tiruppur"
+
+            if sb_selected:
+                from pages.helper import chatbot_engine
+                st.session_state["chat_history"].append({"role": "user", "content": sb_selected})
+                user_name = st.session_state.get("username", "inika")
+                response = chatbot_engine.query_avinashi_ai(sb_selected, current_user=user_name)
+                st.session_state["chat_history"].append({"role": "assistant", "content": response})
+                st.rerun()
 
             # Display last 4 messages in history
             for msg in st.session_state["chat_history"][-4:]:
@@ -321,10 +330,8 @@ def render_sidebar_chatbot():
 
             # Form Input for query
             with st.form(key="sb_chat_form", clear_on_submit=True):
-                default_val = st.session_state.pop("sb_chat_query", "")
                 sb_query = st.text_input(
                     "Ask AVINASHI-AI:",
-                    value=default_val,
                     placeholder="Type a question...",
                     label_visibility="collapsed"
                 )

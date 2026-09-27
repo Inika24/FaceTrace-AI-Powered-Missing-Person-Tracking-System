@@ -267,16 +267,23 @@ if st.session_state.get("authentication_status"):
             {"role": "assistant", "content": "👋 Welcome Officer Inika! I am **AVINASHI-AI**. Ask me anything about registered cases, location statistics, or facial mesh metrics!"}
         ]
 
-    # Quick Suggestion Chips
+    # Quick Suggestion Chips (Instant Interactive Triggers)
     q_col1, q_col2, q_col3, q_col4 = st.columns(4)
+    selected_query = None
     if q_col1.button("📊 Total Cases Count", key="btn_q1"):
-        st.session_state["pending_chat_query"] = "How many total cases are registered?"
-    if q_col2.button("📍 Cases in Tiruppur", key="btn_q2"):
-        st.session_state["pending_chat_query"] = "Show cases in Tiruppur"
-    if q_col3.button("🔍 Birthmark Search", key="btn_q3"):
-        st.session_state["pending_chat_query"] = "Find cases with birthmark on chin"
-    if q_col4.button("🧠 Explain AI Mesh", key="btn_q4"):
-        st.session_state["pending_chat_query"] = "Explain 468 landmark mesh algorithm"
+        selected_query = "How many total cases are registered?"
+    elif q_col2.button("📍 Cases in Tiruppur", key="btn_q2"):
+        selected_query = "Show cases in Tiruppur"
+    elif q_col3.button("🔍 Birthmark Search", key="btn_q3"):
+        selected_query = "Find cases with birthmark on chin"
+    elif q_col4.button("🧠 Explain AI Mesh", key="btn_q4"):
+        selected_query = "Explain 468 landmark mesh algorithm"
+
+    if selected_query:
+        st.session_state["chat_history"].append({"role": "user", "content": selected_query})
+        response = chatbot_engine.query_avinashi_ai(selected_query, current_user=st.session_state.get("user", "inika"))
+        st.session_state["chat_history"].append({"role": "assistant", "content": response})
+        st.rerun()
 
     # Chat message history
     for msg in st.session_state["chat_history"]:
@@ -285,11 +292,9 @@ if st.session_state.get("authentication_status"):
 
     # Form Input for query
     with st.form(key="sentinel_chat_form", clear_on_submit=True):
-        default_val = st.session_state.pop("pending_chat_query", "")
         chat_query = st.text_input(
             "Type your question for AVINASHI-AI below:",
-            value=default_val,
-            placeholder="e.g. How many cases in Tiruppur? or Explain MediaPipe 468 mesh..."
+            placeholder="e.g. Hi! or How many cases in Tiruppur? or Search birthmark..."
         )
         submit_chat = st.form_submit_button("💬 Send Query to AVINASHI-AI", type="primary")
 
