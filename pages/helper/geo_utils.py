@@ -145,7 +145,7 @@ def get_location_coords(location_name: str):
 def render_english_map(counts_dict: dict, height: int = 500):
     """
     Render Folium GIS map using 100% Free English Esri World Street Map tiles (No API key needed).
-    Supports Cities, States, and Countries.
+    Supports Cities, States, and Countries with automatic single-world view and pin fitting.
     """
     import folium
     from streamlit_folium import st_folium
@@ -153,7 +153,9 @@ def render_english_map(counts_dict: dict, height: int = 500):
     # Esri World Street Map (100% Free English Labels, 0 API Keys, 0 Warnings/Watermarks)
     m = folium.Map(
         location=[20.5937, 78.9629],
-        zoom_start=4,
+        zoom_start=5,
+        min_zoom=3,
+        max_bounds=True,
         tiles=None
     )
 
@@ -162,9 +164,11 @@ def render_english_map(counts_dict: dict, height: int = 500):
         attr="Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS",
         name="Esri World Street Map",
         overlay=False,
-        control=True
+        control=True,
+        no_wrap=True
     ).add_to(m)
 
+    placed_coords = []
     if counts_dict:
         for loc, data in counts_dict.items():
             total = data["found"] + data["not_found"]
@@ -172,6 +176,7 @@ def render_english_map(counts_dict: dict, height: int = 500):
             if not coords:
                 continue
 
+            placed_coords.append(coords)
             radius = max(8, min(40, total * 6))
             color = "#ef4444" if data["not_found"] > 0 else "#10b981"
             tooltip = (
@@ -187,8 +192,18 @@ def render_english_map(counts_dict: dict, height: int = 500):
                 color=color,
                 fill=True,
                 fill_color=color,
-                fill_opacity=0.65,
+                fill_opacity=0.7,
                 tooltip=folium.Tooltip(tooltip),
             ).add_to(m)
+
+    # Automatically fit map view around placed pins if present
+    if len(placed_coords) == 1:
+        m.location = placed_coords[0]
+        m.zoom_start = 6
+    elif len(placed_coords) > 1:
+        try:
+            m.fit_bounds(placed_coords, padding=(40, 40))
+        except Exception:
+            pass
 
     st_folium(m, width="100%", height=height, returned_objects=[])
