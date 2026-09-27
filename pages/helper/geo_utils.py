@@ -144,15 +144,15 @@ def get_location_coords(location_name: str):
 
 def render_english_map(counts_dict: dict, height: int = 500):
     """
-    Render Folium GIS map using 100% ENGLISH CARTO Voyager tile server.
+    Render Folium GIS map using 100% Free English Esri World Street Map tiles (No API key needed).
     Supports Cities, States, and Countries.
     """
     import folium
     from streamlit_folium import st_folium
 
-    # CARTO Voyager English Map Tiles (No API key needed, 100% English labels)
-    tiles_url = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-    attr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    # Esri World Street Map (Free English Labels, No API Key Required)
+    tiles_url = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+    attr = "Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS"
 
     m = folium.Map(
         location=[20.5937, 78.9629],

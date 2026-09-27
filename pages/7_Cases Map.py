@@ -16,7 +16,7 @@ from pages.helper import geo_utils
 
 ui_theme.render_header(
     title="Geographic Case Density — GIS Map",
-    subtitle="Interactive location tracking mapped across Cities, States, and Countries with 100% English Labels",
+    subtitle="Interactive location tracking mapped across Cities, States, and Countries",
     badge="GIS LOCATION ANALYTICS",
     icon="🗺️"
 )
