@@ -150,16 +150,20 @@ def render_english_map(counts_dict: dict, height: int = 500):
     import folium
     from streamlit_folium import st_folium
 
-    # Esri World Street Map (Free English Labels, No API Key Required)
-    tiles_url = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
-    attr = "Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS"
-
+    # Esri World Street Map (100% Free English Labels, 0 API Keys, 0 Warnings/Watermarks)
     m = folium.Map(
         location=[20.5937, 78.9629],
         zoom_start=4,
-        tiles=tiles_url,
-        attr=attr
+        tiles=None
     )
+
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri, HERE, Garmin, USGS, NGA, EPA, USDA, NPS",
+        name="Esri World Street Map",
+        overlay=False,
+        control=True
+    ).add_to(m)
 
     if counts_dict:
         for loc, data in counts_dict.items():
