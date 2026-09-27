@@ -35,7 +35,6 @@ ui_theme.render_header(
     icon="📹"
 )
 
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 st.markdown("### 📹 Step 1: Input CCTV Footage / Video Feed")
 
 video_source = st.file_uploader(
@@ -48,8 +47,6 @@ c1, c2, c3 = st.columns(3)
 frame_skip = c1.slider("Frame Sampling Frequency", min_value=1, max_value=30, value=5, help="Scan every Nth frame")
 dist_thresh = c2.slider("Match Sensitivity Distance", min_value=1.0, max_value=5.0, value=3.0, step=0.1)
 run_btn = c3.button("⚡ Start CCTV Surveillance Scan", type="primary")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 if run_btn:
     if not video_source:
@@ -80,7 +77,6 @@ if run_btn:
             except Exception:
                 pass
 
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         st.markdown("### 📊 Surveillance Diagnostic & Match Log")
 
         # Render Diagnostics Summary Grid

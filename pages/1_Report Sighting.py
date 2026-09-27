@@ -31,7 +31,6 @@ ui_theme.render_header(
 )
 
 # Step 1: Missing Person Lookup
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 st.markdown("### 🔍 Step 1: Find the Missing Person Record")
 st.caption("Search by Aadhaar Card Number, Complainant Phone Number, Person Name, or Case ID.")
 
@@ -82,10 +81,7 @@ if matched_cases:
 elif search_query.strip():
     st.warning("⚠️ No exact record found. You can still submit a general sighting below!")
 
-st.markdown("</div>", unsafe_allow_html=True)
-
 # Step 2: Upload Evidence & Location Details
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 st.markdown("### 📸 Step 2: Sighting Location & Photo/Video Evidence")
 
 upload_mode = st.radio(
@@ -210,5 +206,3 @@ if save_flag == 1:
     st.success("🎉 **Sighting Report Successfully Dispatched to Station Officers & AI Match Engine!**")
     if selected_case:
         st.info(f"💡 Report linked to Case ID **{selected_case.id}** for {selected_case.name}. Track live updates under **Track Case**.")
-
-st.markdown("</div>", unsafe_allow_html=True)

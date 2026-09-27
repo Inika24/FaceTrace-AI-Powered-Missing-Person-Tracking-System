@@ -24,6 +24,12 @@ def inject_custom_theme():
             color: #0f172a !important;
         }
 
+        /* Reduce top padding in main container */
+        .stMainBlockContainer, div[data-testid="stMainBlockContainer"] {
+            padding-top: 1.8rem !important;
+            padding-bottom: 2rem !important;
+        }
+
         /* Streamlit Header */
         header[data-testid="stHeader"] {
             background: linear-gradient(135deg, #090d16 0%, #1e3a8a 100%) !important;

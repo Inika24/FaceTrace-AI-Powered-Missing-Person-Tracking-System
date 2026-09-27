@@ -299,7 +299,6 @@ ui_theme.render_header(
 )
 
 # ── Filter Bar Card ───────────────────────────────────────────────────────────
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 f_col1, f_col2, f_col3 = st.columns([2, 3, 2])
 
 status = f_col1.selectbox(
@@ -317,7 +316,6 @@ search_name = f_col2.text_input(
 )
 
 date_filter = f_col3.date_input("Filter by Registration Date", value=None)
-st.markdown("</div>", unsafe_allow_html=True)
 
 # ── Public Cases View ─────────────────────────────────────────────────────────
 if status == "Public Cases":

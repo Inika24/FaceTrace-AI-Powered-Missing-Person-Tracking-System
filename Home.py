@@ -308,131 +308,25 @@ if st.session_state.get("authentication_status"):
     st.markdown("<br>", unsafe_allow_html=True)
 
     # ── Interactive Cases Map Section ─────────────────────────────────────────
-    st.markdown(
-        """
-        <div style="background: #ffffff; border-radius: 16px; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-            <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-top: 0;">
-                📍 Nationwide Case Density Map
-            </h3>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.subheader("📍 Geographic Case Density Map (City / State / Country)")
+    counts = db_queries.get_case_counts_by_city()
 
-    try:
-        import folium
-        from streamlit_folium import st_folium
+    if not counts:
+        st.info("ℹ️ No cases with location data available yet. Register a new case to populate map pins.")
+    else:
+        from pages.helper import geo_utils
+        geo_utils.render_english_map(counts, height=450)
 
-        CITY_COORDS = {
-            "Delhi": (28.6139, 77.2090),
-            "New Delhi": (28.6139, 77.2090),
-            "Mumbai": (19.0760, 72.8777),
-            "Bengaluru": (12.9716, 77.5946),
-            "Bangalore": (12.9716, 77.5946),
-            "Hyderabad": (17.3850, 78.4867),
-            "Chennai": (13.0827, 80.2707),
-            "Kolkata": (22.5726, 88.3639),
-            "Pune": (18.5204, 73.8567),
-            "Ahmedabad": (23.0225, 72.5714),
-            "Jaipur": (26.9124, 75.7873),
-            "Lucknow": (26.8467, 80.9462),
-            "Kanpur": (26.4499, 80.3319),
-            "Nagpur": (21.1458, 79.0882),
-            "Indore": (22.7196, 75.8577),
-            "Bhopal": (23.2599, 77.4126),
-            "Visakhapatnam": (17.6868, 83.2185),
-            "Patna": (25.5941, 85.1376),
-            "Vadodara": (22.3072, 73.1812),
-            "Surat": (21.1702, 72.8311),
-            "Noida": (28.5355, 77.3910),
-            "Gurgaon": (28.4595, 77.0266),
-            "Gurugram": (28.4595, 77.0266),
-            "Chandigarh": (30.7333, 76.7794),
-            "Coimbatore": (11.0168, 76.9558),
-            "Kochi": (9.9312, 76.2673),
-            "Agra": (27.1767, 78.0081),
-            "Varanasi": (25.3176, 82.9739),
-            "Meerut": (28.9845, 77.7064),
-            "Raipur": (21.2514, 81.6296),
-            "Ranchi": (23.3441, 85.3096),
-            "Guwahati": (26.1445, 91.7362),
-            "Jodhpur": (26.2389, 73.0243),
-            "Amritsar": (31.6340, 74.8723),
-            "Faridabad": (28.4089, 77.3178),
-            "Allahabad": (25.4358, 81.8463),
-            "Prayagraj": (25.4358, 81.8463),
-            "Mathura": (27.4924, 77.6737),
-            "Bareilly": (28.3670, 79.4304),
-            "Aligarh": (27.8974, 78.0880),
-            "Moradabad": (28.8386, 78.7733),
-            "Saharanpur": (29.9680, 77.5460),
-            "Gorakhpur": (26.7606, 83.3732),
-            "Firozabad": (27.1591, 78.3957),
-            "Jhansi": (25.4484, 78.5685),
-            "Ghaziabad": (28.6692, 77.4538),
-            "Ludhiana": (30.9010, 75.8573),
-            "Jalandhar": (31.3260, 75.5762),
-            "Dehradun": (30.3165, 78.0322),
-            "Haridwar": (29.9457, 78.1642),
-            "Rishikesh": (30.0869, 78.2676),
-            "Shimla": (31.1048, 77.1734),
-            "Bathinda": (30.2110, 74.9455),
-            "Unknown": (20.5937, 78.9629),
-        }
-
-        counts = db_queries.get_case_counts_by_city()
-
-        if not counts:
-            st.info("ℹ️ No cases with city location data available yet. Register a new case to populate map pins.")
-        else:
-            m = folium.Map(
-                location=[20.5937, 78.9629], zoom_start=5, tiles="OpenStreetMap"
-            )
-
-            for city, data in counts.items():
-                total = data["found"] + data["not_found"]
-                coords = CITY_COORDS.get(city)
-                if coords is None:
-                    for key, val in CITY_COORDS.items():
-                        if key.lower() == city.lower():
-                            coords = val
-                            break
-                if coords is None:
-                    continue
-
-                color = "#ef4444" if data["not_found"] > 0 else "#10b981"
-                tooltip = (
-                    f"<b>{city}</b><br>"
-                    f"Total Cases: {total}<br>"
-                    f"Active Missing: {data['not_found']}<br>"
-                    f"Resolved/Found: {data['found']}"
-                )
-                folium.CircleMarker(
-                    location=coords,
-                    radius=max(8, min(35, total * 5)),
-                    color=color,
-                    fill=True,
-                    fill_color=color,
-                    fill_opacity=0.6,
-                    tooltip=folium.Tooltip(tooltip),
-                ).add_to(m)
-
-            st_folium(m, width="100%", height=440, returned_objects=[])
-
-            st.markdown(
-                """
-                <div style="font-size: 0.85rem; color: #64748b; margin-top: 10px; display: flex; gap: 15px; align-items: center;">
-                    <span><strong style="color: #ef4444;">🔴 Has Unresolved Cases</strong></span>
-                    <span><strong style="color: #10b981;">🟢 All Cases Resolved</strong></span>
-                    <span><em>Circle size reflects total case volume</em></span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-    except ImportError:
-        st.info("ℹ️ Install `folium` and `streamlit-folium` to render the GIS map.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(
+            """
+            <div style="font-size: 0.85rem; color: #64748b; margin-top: 10px; display: flex; gap: 15px; align-items: center; margin-bottom: 2rem;">
+                <span><strong style="color: #ef4444;">🔴 Has Unresolved Cases</strong></span>
+                <span><strong style="color: #10b981;">🟢 All Cases Resolved</strong></span>
+                <span><em>Circle size reflects total case volume</em></span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 elif st.session_state.get("authentication_status") == False:
     st.error("❌ Invalid Username or Password. Please try again.")

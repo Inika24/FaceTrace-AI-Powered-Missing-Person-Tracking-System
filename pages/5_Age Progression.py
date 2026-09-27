@@ -38,7 +38,6 @@ ui_theme.render_header(
 )
 
 # Input Mode Card
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 st.markdown("### 👤 Select Target Case or Upload Photo")
 
 source_mode = st.radio(
@@ -75,10 +74,7 @@ else:
         target_img_np = image_obj_to_numpy(up_file)
         person_name = "Uploaded Subject"
 
-st.markdown("</div>", unsafe_allow_html=True)
-
 if target_img_np is not None:
-    st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
     st.markdown(f"### ⚙️ Predictive Aging Projection Settings — **{person_name}**")
 
     c1, c2 = st.columns([2.5, 1], gap="medium")
@@ -95,8 +91,6 @@ if target_img_np is not None:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
         gen_btn = st.button("✨ Run AI Age Simulation", type="primary", use_container_width=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
     # Execute simulation on button click or if stored in session state
     if gen_btn:
         st.session_state["run_age_sim"] = True
@@ -107,7 +101,6 @@ if target_img_np is not None:
         with st.spinner(f"✨ Generating +{current_years}-year facial progression & extrapolating landmark mesh..."):
             aged_np, aged_landmarks = simulate_age_progression(target_img_np, years=current_years)
 
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         st.markdown(f"### 📸 Visual Comparison: Original Photo vs +{current_years} Years Projection")
 
         img_col1, img_col2 = st.columns(2, gap="large")

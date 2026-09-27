@@ -23,7 +23,6 @@ ui_theme.render_header(
 )
 
 # Search Input Card
-st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
 s_col1, s_col2 = st.columns([4, 1])
 
 with s_col1:
@@ -36,8 +35,6 @@ with s_col1:
 with s_col2:
     st.markdown("<br>", unsafe_allow_html=True)
     search_btn = st.button("🔎 Track Case")
-
-st.markdown("</div>", unsafe_allow_html=True)
 
 if not search_query.strip():
     st.markdown(
